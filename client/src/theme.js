@@ -178,7 +178,7 @@ theme = createTheme(theme, {
                     '&:disabled': {
                         backgroundColor: `rgba(${theme.palette.text.secondary}, 0.07)`,
                         border: 'none',
-                    }
+                    },
                 },
                 outlinedError: {
                     fontWeight: 500,
