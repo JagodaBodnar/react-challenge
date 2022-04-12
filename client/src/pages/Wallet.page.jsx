@@ -10,7 +10,7 @@ export const WalletPage = () => (
       <Grid item xs={12} md={8}>
         <LedgerWidget />
       </Grid>
-      <Grid container item xs={12} md={4} spacing={3}>
+      <Grid container item xs={12} md={4} spacing={1}>
         <Grid item xs={12} data-test-id={'wallet-top-sidebar'}>
           <ChartSummaryService />
         </Grid>

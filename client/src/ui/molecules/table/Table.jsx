@@ -10,12 +10,47 @@ import Checkbox from '@mui/material/Checkbox';
 import { EnhancedTableHead } from './components/EnhancedTableHead';
 import { EnhancedTableToolbar } from './components/EnhancedTableToolbar';
 
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
 export const Table = ({ headCells, rows, getUniqueId, deleteRecords }) => {
+  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const handleSelectAllClick = (event) => {
     setSelected(event.target.checked ? rows.map((n) => getUniqueId(n)) : []);
+  };
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
   };
 
   const handleClick = (event, id) => {
@@ -35,7 +70,6 @@ export const Table = ({ headCells, rows, getUniqueId, deleteRecords }) => {
     setPage(0);
   };
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
@@ -54,9 +88,12 @@ export const Table = ({ headCells, rows, getUniqueId, deleteRecords }) => {
             onSelectAllClick={handleSelectAllClick}
             rowCount={rows.length}
             headCells={headCells}
+            onRequestSort={handleRequestSort}
+            order={order}
+            orderBy={orderBy}
           />
           <TableBody>
-            {rows
+            {stableSort(rows, getComparator(order, orderBy))
               .slice()
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => {

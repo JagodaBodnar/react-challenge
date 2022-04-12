@@ -13,6 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useContext } from 'react';
 import { AddNewBudgetRecordModal } from '../ui/organisms/AddNewBudgetRecord.modal';
 import RootContext from '../context/context';
+import { useSnackbar } from 'notistack';
 
 export const BudgetPage = () => {
   const context = useContext(RootContext);
@@ -97,12 +98,17 @@ const BudgetTable = () => {
   const { isLoading, error, data } = useQuery('budgetData', () =>
     BudgetService.findAll(),
   );
+  const { enqueueSnackbar } = useSnackbar();
 
   const mutation = useMutation((ids) => BudgetService.remove({ ids }), {
     onSuccess: () => {
+      enqueueSnackbar('Element został usunięty', { variant: 'success' });
       queryClient.invalidateQueries('budgetData');
       queryClient.invalidateQueries('categoriesData');
       queryClient.invalidateQueries('chartBudgetData');
+    },
+    onError: () => {
+      enqueueSnackbar('Wystąpił nieoczekiwany błąd', { variant: 'error' });
     },
   });
 

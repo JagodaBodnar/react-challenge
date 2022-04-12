@@ -24,7 +24,7 @@ export const EnhancedTableToolbar = ({ selected, onDelete }) => {
         variant="subtitle1"
         component="p"
       >
-        Wybrano: {numSelected}
+        Wybrano: <strong>{numSelected}</strong>
       </Typography>
       <Tooltip title="Delete">
         <IconButton onClick={onDelete}>

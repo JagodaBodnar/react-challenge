@@ -12,10 +12,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import RootContext from '../../context/context';
 import { Button } from '../atoms/Button';
+import { useSnackbar } from 'notistack';
 
 export const AddNewBudgetRecordModal = ({ handleClose, ...props }) => {
   const context = useContext(RootContext);
   const { setOpenModal, setCategory, category } = context;
+  const { enqueueSnackbar } = useSnackbar();
 
   const schema = yup.object().shape({
     amount: yup
@@ -50,8 +52,12 @@ export const AddNewBudgetRecordModal = ({ handleClose, ...props }) => {
     (requestBody) => BudgetService.create({ requestBody }),
     {
       onSuccess: () => {
+        enqueueSnackbar('Budżet został zdefiniowany', { variant: 'success' });
         queryClient.invalidateQueries('budgetData');
         queryClient.invalidateQueries('categoriesData');
+      },
+      onError: () => {
+        enqueueSnackbar('Wystąpił nieoczekiwany błąd', { variant: 'error' });
       },
     },
   );

@@ -76,7 +76,9 @@ export function ChartBudgetService() {
         </StyledBalanceContainer>
         <Typography variant="subtitle1">Podsumowanie wydatków</Typography>
       </div>
-      {!data || !data.hasData || data.chartData.datasets[0].data.every(e=>e===0) ?(
+      {!data ||
+      !data.hasData ||
+      data.chartData.datasets[0].data.every((e) => e === 0) ? (
         <StyledNoResults>Brak wyników</StyledNoResults>
       ) : (
         <Bar options={options} data={data?.chartData} />

@@ -66,7 +66,7 @@ export function ChartSummaryService() {
         <Typography variant="subtitle1">Pozostała kwota</Typography>
       </div>
       <StyledChartContainer>
-        {!data || !data.exists || (data.summary.spending.length === 0) ? (
+        {!data || !data.exists || data.summary.spending.length === 0 ? (
           <StyledNoResults>Brak wyników</StyledNoResults>
         ) : (
           <Doughnut options={options} data={data?.chartData} />

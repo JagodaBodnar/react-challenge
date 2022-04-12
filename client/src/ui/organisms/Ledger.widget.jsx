@@ -17,8 +17,9 @@ import { Button } from '../atoms/Button';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import RootContext from '../../context/context';
-import { AddNewLedgerRecordModal } from './AddNewLegerRecord.modal';
+import { AddNewLedgerRecordModal } from './AddNewLedgerRecord.modal';
 import { useContext } from 'react';
+import { useSnackbar } from 'notistack';
 
 export const LedgerWidget = () => {
   const context = useContext(RootContext);
@@ -88,7 +89,7 @@ const columns = [
     renderCell: (row) => <LocalizedDate date={row.createdAt} />,
   },
   {
-    id: 'currentSpendingPercent',
+    id: 'amountInCents',
     label: 'Kwota',
     renderCell: (row) =>
       row.mode === 'INCOME' ? (
@@ -108,12 +109,17 @@ const LedgerTable = () => {
   const { isLoading, error, data } = useQuery('ledgerData', () =>
     LedgerService.findAll(),
   );
+  const { enqueueSnackbar } = useSnackbar();
 
   const mutation = useMutation((ids) => LedgerService.remove({ ids }), {
     onSuccess: () => {
+      enqueueSnackbar('Element został usunięty', { variant: 'success' });
       queryClient.invalidateQueries('ledgerData');
       queryClient.invalidateQueries('chartServiceData');
       queryClient.invalidateQueries('chartBudgetData');
+    },
+    onError: () => {
+      enqueueSnackbar('Wystąpił nieoczekiwany błąd', { variant: 'error' });
     },
   });
   if (isLoading) return <Loader />;

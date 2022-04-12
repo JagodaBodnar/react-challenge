@@ -12,6 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import RootContext from '../../context/context';
 import { Button } from '../atoms/Button';
+import { useSnackbar } from 'notistack';
 
 export const AddNewLedgerRecordModal = ({ type, handleClose, ...props }) => {
   const context = useContext(RootContext);
@@ -48,14 +49,22 @@ export const AddNewLedgerRecordModal = ({ type, handleClose, ...props }) => {
     resolver: yupResolver(schema),
   });
   const queryClient = useQueryClient();
+  const { enqueueSnackbar } = useSnackbar();
+
   const { data } = useQuery('categoriesData', () => CategoryService.findAll());
   const addLedgerRecordMutation = useMutation(
     (requestBody) => LedgerService.create({ requestBody }),
     {
       onSuccess: () => {
+        type === 'INCOME'
+          ? enqueueSnackbar('Wpływ został dodany', { variant: 'success' })
+          : enqueueSnackbar('Wydatek został zapisany', { variant: 'success' });
         queryClient.invalidateQueries('ledgerData');
         queryClient.invalidateQueries('chartServiceData');
         queryClient.invalidateQueries('chartBudgetData');
+      },
+      onError: () => {
+        enqueueSnackbar('Wystąpił nieoczekiwany błąd', { variant: 'error' });
       },
     },
   );
